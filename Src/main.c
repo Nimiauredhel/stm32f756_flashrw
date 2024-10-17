@@ -285,7 +285,7 @@ void SystemClock_Config(void)
 static void MX_NVIC_Init(void)
 {
   /* USART3_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(USART3_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(USART3_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(USART3_IRQn);
 }
 
@@ -417,10 +417,6 @@ static void MX_USART3_UART_Init(void)
   }
   /* USER CODE BEGIN USART3_Init 2 */
 
-  input_buffer.buffer_position = 0;
-  memset(input_buffer.buffer, (uint8_t)'\0', sizeof(uint8_t) * RX_BUFFER_LENGTH);
-  HAL_UART_Receive_IT(&huart3, &input_buffer.buffer[input_buffer.buffer_position], 1);
-
   /* USER CODE END USART3_Init 2 */
 
 }
@@ -549,41 +545,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
-  char input = '\0';
-  char buffer[32];
-  char output[48];
-
-  HAL_UART_Transmit(&huart3, (uint8_t *)&"Hello World!\n\r", 16, 0xFFFF);
-
   /* Infinite loop */
   for(;;)
   {
-	  /*
-    uint8_t index = 0;
-    
-    for (int i = 0; i < 32; i++) buffer[i] = '\0';
-    for (int i = 0; i < 48; i++) output[i] = '\0';
-
-    while (index < 30)
-    {
-        while(0x00U != HAL_UART_Receive(&huart3, (uint8_t *)&input, 1, 0xFFFF))
-        {
-            osDelay(pdMS_TO_TICKS(1));
-        }
-
-        if (input == '\r') break;
-
-        buffer[index] = input;
-        index++;
-    }
-
-    buffer[index] = '\n';
-    buffer[index+1] = '\r';
-
-    sprintf(output, "You said %s", buffer);
-	HAL_UART_Transmit(&huart3, (uint8_t *)output, 48, 0xFFFF);
-	*/
-    osDelay(pdMS_TO_TICKS(10));
+    osDelay(1);
   }
   /* USER CODE END 5 */
 }
