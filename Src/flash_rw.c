@@ -7,39 +7,50 @@
 
 #include "flash_rw.h"
 
-typedef uint64_t FlashData_t;
-#define FLASH_DATA_SIZE sizeof(FlashData_t)
-
 void flash_erase_sector(uint32_t sector_to_erase)
 {
 	FLASH_EraseInitTypeDef flash_erase_struct = {0};
 	uint32_t error_status = 0;
+	HAL_StatusTypeDef return_error_status;
 
 	HAL_FLASH_Unlock();
 
 	// filling in the flash erase struct
 	flash_erase_struct.TypeErase = FLASH_TYPEERASE_SECTORS;
-	flash_erase_struct.Sector = sector_to_erase;
+	flash_erase_struct.Sector = FLASH_SECTOR_5;
 	flash_erase_struct.NbSectors = 1;
+    flash_erase_struct.VoltageRange = 2;
 
-	HAL_FLASHEx_Erase(&flash_erase_struct, &error_status);
-
-	HAL_FLASH_Lock();
-}
-
-void flash_read(uint32_t srcAdr, uint8_t *dstPtr, uint16_t length)
-{
-
-	HAL_FLASH_Unlock();
+	return_error_status = HAL_FLASHEx_Erase(&flash_erase_struct, &error_status);
 
 	HAL_FLASH_Lock();
 }
 
-void flash_write(uint32_t dstAdr, uint8_t *srcPtr, uint16_t length)
+void flash_read(uint32_t srcAdr, uint8_t *dstPtr, uint16_t length_bytes)
 {
-	uint8_t double_word_data[FLASH_DATA_SIZE];
-
 	HAL_FLASH_Unlock();
 
+    uint8_t *srcPtr = (uint8_t *)srcAdr;
+
+    for (uint16_t i = 0; i < length_bytes; i++)
+    {
+        dstPtr[i] = srcPtr[i];
+    }
+
 	HAL_FLASH_Lock();
+}
+
+void flash_write(uint32_t dstAdr, uint8_t *srcPtr, uint16_t length_bytes)
+{
+    // TODO: use error status, error handling
+    HAL_StatusTypeDef error_status;
+    
+	error_status = HAL_FLASH_Unlock();
+
+    for (uint32_t i = 0; i < length_bytes; i++)
+    {
+        error_status = HAL_FLASH_Program(TYPEPROGRAM_BYTE, dstAdr + i, srcPtr[i]);
+    }
+
+	error_status = HAL_FLASH_Lock();
 }

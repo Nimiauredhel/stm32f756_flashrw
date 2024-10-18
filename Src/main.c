@@ -23,7 +23,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "stdlib.h"
+#include "flash_rw.h"
+#include "flash_map.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -545,10 +547,42 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
+    uint16_t counter = 0;
+    uint16_t log_count = 100;
+    char *testLog = malloc(sizeof(char) * 64);
+
+    osDelay(pdMS_TO_TICKS(100));
+
+    printf("Hello from default task start.\n\r");
+    osDelay(pdMS_TO_TICKS(100));
+
+    printf("Erasing sector 5.\n\r");
+    flash_erase_sector(FLASH_SECTOR_5);
+    osDelay(pdMS_TO_TICKS(100));
+
+    printf("Writing %d test logs.\n\r", log_count);
+
+    for (int i = 0; i < log_count; i++)
+    {
+        sprintf(testLog, "Test log number %d.", counter);
+        flash_write(FLASH_SECTOR_5_ADDRESS+(counter*64), (uint8_t *)testLog, 64);
+        counter++;
+    }
+
+    printf("Written %d test logs.\n\r", log_count);
+    counter = 0;
+    osDelay(pdMS_TO_TICKS(100));
+
+    printf("Reading test logs in loop:\n\r");
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    uint32_t srcAdr = FLASH_SECTOR_5_ADDRESS + (counter*64);
+    flash_read(srcAdr, (uint8_t *)testLog, 64);
+    printf("Log %d[%s]\n\r", counter, testLog);
+    osDelay(pdMS_TO_TICKS(500));
+    counter++;
+    if (counter >= log_count) counter = 0;
   }
   /* USER CODE END 5 */
 }
