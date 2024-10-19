@@ -55,6 +55,8 @@ typedef struct FlashMap
 	uint8_t next_string_write_index;
 	// equals 1 if sector erased, 0 if sector written
 	uint8_t sectors_erased_flags[FLASH_USED_SECTORS_COUNT];
+	// hardware reference number of each sector
+	uint8_t sectors_numbers[FLASH_USED_SECTORS_COUNT];
 	// total number of strings each sector can hold
 	uint16_t sectors_string_capacities[FLASH_USED_SECTORS_COUNT];
 	// memory address of each sector
@@ -65,12 +67,13 @@ typedef const struct FlashSectorConfig
 {
 	uint32_t sector_address;
 	uint32_t sector_size_bytes;
+	uint8_t sector_number;
 } FlashSectorConfig_t;
 
 void flash_map_save(FlashMap_t *map, uint32_t dstAddress);
 void flash_map_load(FlashMap_t *map, uint32_t dstAddress);
 FlashMap_t flash_map_initialize(FlashSectorConfig_t initData[FLASH_USED_SECTORS_COUNT]);
 void flash_map_append_string(FlashMap_t *map, uint8_t *new_string);
-void flash_map_get_string_nonalloc(uint8_t sector_index, uint8_t string_index, uint8_t (*return_buffer)[FLASH_STRING_LENGTH_BYTES]);
+void flash_map_get_string_nonalloc(FlashMap_t *map, uint8_t sector_index, uint8_t string_index, uint8_t (*return_buffer)[FLASH_STRING_LENGTH_BYTES]);
 
 #endif /* FLASH_MAP_H_ */
