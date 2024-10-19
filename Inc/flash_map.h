@@ -63,17 +63,19 @@ typedef struct FlashMap
 	uint32_t sectors_addresses[FLASH_USED_SECTORS_COUNT];
 } FlashMap_t;
 
-typedef const struct FlashSectorConfig
+typedef struct FlashSectorConfig
 {
 	uint32_t sector_address;
 	uint32_t sector_size_bytes;
 	uint8_t sector_number;
 } FlashSectorConfig_t;
 
+extern const FlashSectorConfig_t sector_configs[FLASH_USED_SECTORS_COUNT];
+
 void flash_map_save(FlashMap_t *map, uint32_t dstAddress);
 void flash_map_load(FlashMap_t *map, uint32_t dstAddress);
-FlashMap_t flash_map_initialize(FlashSectorConfig_t initData[FLASH_USED_SECTORS_COUNT]);
+FlashMap_t flash_map_initialize(uint8_t numSectors, FlashSectorConfig_t *initData);
 void flash_map_append_string(FlashMap_t *map, uint8_t *new_string);
-void flash_map_get_string_nonalloc(FlashMap_t *map, uint8_t sector_index, uint8_t string_index, uint8_t (*return_buffer)[FLASH_STRING_LENGTH_BYTES]);
+void flash_map_get_string_nonalloc(FlashMap_t *map, uint8_t sector_index, uint8_t string_index, uint8_t *return_buffer);
 
 #endif /* FLASH_MAP_H_ */
