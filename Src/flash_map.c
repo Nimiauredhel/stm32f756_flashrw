@@ -19,35 +19,34 @@ static const FlashSectorConfig_t sector_configs[FLASH_USED_SECTORS_COUNT] =
 
 void flash_map_save(FlashMap_t *map, uint32_t dstAddress)
 {
-	uint32_t *serialized_map = malloc(sizeof(FlashMap_t));
-	*serialized_map = *(uint32_t *)map;
+	uint8_t *castSrcPtr = (uint8_t *)map;
+	flash_write(FLASH_SECTOR_4_ADDRESS, castSrcPtr, sizeof(castSrcPtr));
 }
 
-void flash_map_load(FlashMap_t *map, uint32_t dstAddress)
+void flash_map_load_nonalloc(FlashMap_t *map, uint32_t dstAddress)
 {
+	flash_read(dstAddress, (uint8_t *)map, sizeof(FlashMap_t));
 }
 
-bool flash_map_initialize(FlashSectorConfig_t initData[FLASH_USED_SECTORS_COUNT])
+FlashMap_t flash_map_initialize(FlashSectorConfig_t initData[FLASH_USED_SECTORS_COUNT])
 {
     // TODO: invalid input handling
 
-    FlashMap_t temp_map;
-    flash_read(FLASH_SECTOR_4_ADDRESS, &temp_map, sizeof(FlashMap_t)); 
-	FlashMap_t *new_map = malloc(sizeof(FlashMap_t));
+	FlashMap_t new_map;
 
-	new_map->map_erased_flag = 0;
-	new_map->map_version_number = FLASH_MAP_VERSION;
-	new_map->sectors_count = FLASH_USED_SECTORS_COUNT;
-    new_map->string_length_bytes = FLASH_STRING_LENGTH_BYTES;
-    new_map->head_sector_index = 0;
-    new_map->tail_sector_index = 0;
-    new_map->next_string_write_index = initData[0].sector_address;
+	new_map.map_erased_flag = 0;
+	new_map.map_version_number = FLASH_MAP_VERSION;
+	new_map.sectors_count = FLASH_USED_SECTORS_COUNT;
+    new_map.string_length_bytes = FLASH_STRING_LENGTH_BYTES;
+    new_map.head_sector_index = 0;
+    new_map.tail_sector_index = 0;
+    new_map.next_string_write_index = initData[0].sector_address;
 
     for (uint8_t i = 0; i < FLASH_USED_SECTORS_COUNT; i++)
     {
-        new_map->sectors_erased_flags[i] = 0;
-        new_map->sectors_string_capacities[i] = initData[i].sector_size_bytes / FLASH_STRING_LENGTH_BYTES;
-        new_map->sectors_addresses[i] = initData[i].sector_address;
+        new_map.sectors_erased_flags[i] = 0;
+        new_map.sectors_string_capacities[i] = initData[i].sector_size_bytes / FLASH_STRING_LENGTH_BYTES;
+        new_map.sectors_addresses[i] = initData[i].sector_address;
     }
 
     return new_map;

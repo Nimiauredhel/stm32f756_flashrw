@@ -41,6 +41,7 @@ typedef struct RxBuffer
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define RTC_BKUP_COMPARE 0x1234
 
 /* USER CODE END PD */
 
@@ -73,6 +74,8 @@ ETH_HandleTypeDef heth;
 
 I2C_HandleTypeDef hi2c1;
 
+RTC_HandleTypeDef hrtc;
+
 UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
@@ -92,6 +95,8 @@ const osMessageQueueAttr_t myQueue01_attributes = {
 /* USER CODE BEGIN PV */
 
 RxBuffer_t input_buffer;
+RTC_TimeTypeDef time_now;
+RTC_DateTypeDef date_now;
 
 /* Retargets the C library printf function to the USART. */
 #include <stdio.h>
@@ -124,16 +129,34 @@ static void MX_ETH_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_I2C1_Init(void);
+static void MX_RTC_Init(void);
 void StartDefaultTask(void *argument);
 
 static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
-void uart3_rx_isr(UART_HandleTypeDef * huart);
+void user_init(void);
+static inline bool was_power_cycled(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+// the static initializations ensure that the value is only tested and set once
+// subsequent calls only have to return a value
+static inline bool was_power_cycled(void)
+{
+	static bool first_call = true;
+	static bool power_cycled = true;
+
+	if (first_call)
+	{
+		first_call = false;
+		power_cycled = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) != RTC_BKUP_COMPARE;
+		if (power_cycled) HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, RTC_BKUP_COMPARE);
+	}
+
+	return power_cycled;
+}
 /* USER CODE END 0 */
 
 /**
@@ -172,6 +195,7 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
   MX_I2C1_Init();
+  MX_RTC_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
@@ -252,8 +276,9 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 4;
@@ -289,6 +314,9 @@ static void MX_NVIC_Init(void)
   /* USART3_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(USART3_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(USART3_IRQn);
+  /* RTC_Alarm_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(RTC_Alarm_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
 }
 
 /**
@@ -385,6 +413,101 @@ static void MX_I2C1_Init(void)
   /* USER CODE BEGIN I2C1_Init 2 */
 
   /* USER CODE END I2C1_Init 2 */
+
+}
+
+/**
+  * @brief RTC Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_RTC_Init(void)
+{
+
+  /* USER CODE BEGIN RTC_Init 0 */
+
+  /* USER CODE END RTC_Init 0 */
+
+  RTC_TimeTypeDef sTime = {0};
+  RTC_DateTypeDef sDate = {0};
+  RTC_AlarmTypeDef sAlarm = {0};
+
+  /* USER CODE BEGIN RTC_Init 1 */
+
+  /* USER CODE END RTC_Init 1 */
+
+  /** Initialize RTC Only
+  */
+  hrtc.Instance = RTC;
+  hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+  hrtc.Init.AsynchPrediv = 127;
+  hrtc.Init.SynchPrediv = 255;
+  hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+  hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+  hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+  if (HAL_RTC_Init(&hrtc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /* USER CODE BEGIN Check_RTC_BKUP */
+
+  if (!was_power_cycled())
+  {
+	  if (HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BCD) != HAL_OK)
+	  {
+		Error_Handler();
+	  }
+
+	  return;
+  }
+
+  /* Note: the following is for "one time" operations after power cycle. */
+  printf("Configuring RTC (power cycled).\n\r");
+
+  /* USER CODE END Check_RTC_BKUP */
+
+  /** Initialize RTC and set the Time and Date
+  */
+  sTime.Hours = 0x0;
+  sTime.Minutes = 0x0;
+  sTime.Seconds = 0x0;
+  sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+  sTime.StoreOperation = RTC_STOREOPERATION_RESET;
+  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sDate.WeekDay = RTC_WEEKDAY_MONDAY;
+  sDate.Month = RTC_MONTH_JANUARY;
+  sDate.Date = 0x1;
+  sDate.Year = 0x0;
+  if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BCD) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Enable the Alarm A
+  */
+  sAlarm.AlarmTime.Hours = 0x0;
+  sAlarm.AlarmTime.Minutes = 0x0;
+  sAlarm.AlarmTime.Seconds = 0x1;
+  sAlarm.AlarmTime.SubSeconds = 0x0;
+  sAlarm.AlarmTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+  sAlarm.AlarmTime.StoreOperation = RTC_STOREOPERATION_RESET;
+  sAlarm.AlarmMask = RTC_ALARMMASK_DATEWEEKDAY|RTC_ALARMMASK_HOURS
+                              |RTC_ALARMMASK_MINUTES;
+  sAlarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_ALL;
+  sAlarm.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_DATE;
+  sAlarm.AlarmDateWeekDay = 0x1;
+  sAlarm.Alarm = RTC_ALARM_A;
+  if (HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BCD) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN RTC_Init 2 */
+
+  /* USER CODE END RTC_Init 2 */
 
 }
 
@@ -535,6 +658,39 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 	HAL_UART_Receive_IT(&huart3, input_buffer.buffer + input_buffer.buffer_position, 1);
 }
+
+void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
+{
+	static uint8_t index = 0;
+	static RTC_AlarmTypeDef sAlarm;
+
+	// update the global timestamp every alarm
+	HAL_RTC_GetTime(hrtc, &time_now, FORMAT_BIN);
+	HAL_RTC_GetDate(hrtc, &date_now, FORMAT_BIN);
+
+	// increment the alarm so it keeps going
+	HAL_RTC_GetAlarm(hrtc,&sAlarm,RTC_ALARM_A,FORMAT_BIN);
+
+	if(sAlarm.AlarmTime.Seconds < 58)
+	{
+		sAlarm.AlarmTime.Seconds += 1;
+	}
+	else
+	{
+		sAlarm.AlarmTime.Seconds = 0;
+	}
+
+	while(HAL_RTC_SetAlarm_IT(hrtc, &sAlarm, FORMAT_BIN)!=HAL_OK)
+	{
+	}
+
+	HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, index == 0);
+	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, index == 1);
+	HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, index == 2);
+
+	index++;
+	if (index >= 3) index = 0;
+}
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -556,22 +712,27 @@ void StartDefaultTask(void *argument)
     printf("Hello from default task start.\n\r");
     osDelay(pdMS_TO_TICKS(100));
 
-    printf("Erasing sector 5.\n\r");
-    flash_erase_sector(FLASH_SECTOR_5);
-    osDelay(pdMS_TO_TICKS(100));
-
-    printf("Writing %d test logs.\n\r", log_count);
-
-    for (int i = 0; i < log_count; i++)
+    if (was_power_cycled())
     {
-        sprintf(testLog, "Test log number %d.", counter);
-        flash_write(FLASH_SECTOR_5_ADDRESS+(counter*64), (uint8_t *)testLog, 64);
-        counter++;
-    }
+		printf("[Power cycled] Erasing sector 5.\n\r");
+		flash_erase_sector(FLASH_SECTOR_5);
+		osDelay(pdMS_TO_TICKS(100));
+		printf("[Power cycled] Writing %d test logs.\n\r", log_count);
+		printf("[Power cycled] Logs written: 000/%02d\b\b\b\b\b\b\b", log_count-1);
 
-    printf("Written %d test logs.\n\r", log_count);
-    counter = 0;
-    osDelay(pdMS_TO_TICKS(100));
+		for (int i = 0; i < log_count; i++)
+		{
+			osDelay(pdMS_TO_TICKS(50));
+			printf("%03d/%03d\b\b\b\b\b\b\b", i, log_count-1);
+			sprintf(testLog, "%02d:%02d:%02d ~ Test log %03d.", time_now.Hours, time_now.Minutes, time_now.Seconds, counter);
+			flash_write(FLASH_SECTOR_5_ADDRESS+(counter*64), (uint8_t *)testLog, 64);
+			counter++;
+		}
+
+		printf("\n\rWritten %d test logs.\n\r", log_count);
+		counter = 0;
+		osDelay(pdMS_TO_TICKS(100));
+    }
 
     printf("Reading test logs in loop:\n\r");
   /* Infinite loop */
@@ -579,7 +740,8 @@ void StartDefaultTask(void *argument)
   {
     uint32_t srcAdr = FLASH_SECTOR_5_ADDRESS + (counter*64);
     flash_read(srcAdr, (uint8_t *)testLog, 64);
-    printf("Log %d[%s]\n\r", counter, testLog);
+	HAL_RTC_GetTime(&hrtc, &time_now, FORMAT_BIN);
+    printf("%02d:%02d:%02d ~ Log %d[%s]\n\r", time_now.Hours, time_now.Minutes, time_now.Seconds, counter, testLog);
     osDelay(pdMS_TO_TICKS(500));
     counter++;
     if (counter >= log_count) counter = 0;

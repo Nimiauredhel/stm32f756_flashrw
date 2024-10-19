@@ -69,7 +69,7 @@ typedef const struct FlashSectorConfig
 
 void flash_map_save(FlashMap_t *map, uint32_t dstAddress);
 void flash_map_load(FlashMap_t *map, uint32_t dstAddress);
-bool flash_map_initialize(FlashSectorConfig_t initData[FLASH_USED_SECTORS_COUNT]);
+FlashMap_t flash_map_initialize(FlashSectorConfig_t initData[FLASH_USED_SECTORS_COUNT]);
 void flash_map_append_string(FlashMap_t *map, uint8_t *new_string);
 void flash_map_get_string_nonalloc(uint8_t sector_index, uint8_t string_index, uint8_t (*return_buffer)[FLASH_STRING_LENGTH_BYTES]);
 
