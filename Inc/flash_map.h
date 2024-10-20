@@ -50,11 +50,11 @@ typedef struct FlashMap
 	uint8_t head_sector_index;
 	// index (within struct) of the latest written sector
 	uint8_t tail_sector_index;
-	// index (within sector) to which the next string should be written. usage example:
-	// next_string_address == (uint8_t *)sector_address + (string_length_bytes * next_index)
-	uint16_t next_string_write_index;
 	// equals 1 if sector erased, 0 if sector written
 	uint8_t sectors_erased_flags[FLASH_USED_SECTORS_COUNT];
+	// index (within sector) to which the next string should be written. usage example:
+	// next_string_address == sector_address + (string_length_bytes * next_index)
+	uint16_t next_string_write_index;
 	// total number of strings each sector can hold
 	uint16_t sectors_string_capacities[FLASH_USED_SECTORS_COUNT];
 	// hardware reference number of each sector

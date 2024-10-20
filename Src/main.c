@@ -691,6 +691,61 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	index++;
 	if (index > 3) index = 0;
 }
+
+void print_flash_map_logs(FlashMap_t *map)
+{
+	printf("\n\rPrinting test logs:\n\r");
+	uint8_t sectorIdx = map->head_sector_index;
+	uint16_t stringIdx = 0;
+	char testLog[FLASH_STRING_LENGTH_BYTES];
+
+	for(;;)
+	{
+		// check if need to start over from head
+		if (sectorIdx == map->tail_sector_index && stringIdx >= map->next_string_write_index)
+		{
+			//sectoridx = inmem_flash_map.head_sector_index;
+			//stringidx = 0;
+			break;
+		}
+		// check if need to increment read sector
+		if (stringIdx >= map->sectors_string_capacities[sectorIdx])
+		{
+			sectorIdx++;
+			stringIdx = 0;
+			if (sectorIdx >= FLASH_USED_SECTORS_COUNT) sectorIdx = 0;
+		}
+
+		flash_map_get_string_nonalloc(map, sectorIdx, stringIdx, (uint8_t *)testLog);
+		printf("%02u%02u:%02u ~ Sector %lu String %05u[%s]\n\r", time_now.Hours, time_now.Minutes, time_now.Seconds, map->sectors_numbers[sectorIdx], stringIdx, testLog);
+		osDelay(pdMS_TO_TICKS(1));
+		stringIdx++;
+	}
+
+	printf("Done.\n\r");
+}
+
+void write_test_flash_map(FlashMap_t *map, uint16_t log_count)
+{
+	uint16_t counter = 0;
+	char testLog[FLASH_STRING_LENGTH_BYTES];
+	printf("Writing %u test logs of max length %u.\n\r", log_count, map->string_length_bytes);
+	printf("\n\rLogs written: 00000/%05u\b\b\b\b\b\b\b\b\b\b\b", log_count-1);
+
+	for (int i = 0; i < log_count; i++)
+	{
+		osDelay(pdMS_TO_TICKS(4));
+		printf("%05u/%05u\b\b\b\b\b\b\b\b\b\b\b", i, log_count-1);
+		sprintf(testLog, "%02u:%02u:%02u ~ Test log %05u.", time_now.Hours, time_now.Minutes, time_now.Seconds, counter);
+		flash_map_append_string(map, (uint8_t *)testLog);
+		counter++;
+	}
+
+	printf("\n\rWritten %d test logs.\n\r", log_count);
+	flash_map_save(map, FLASH_SECTOR_3_ADDRESS);
+	printf("Saved flash map to flash storage.\n\r");
+	osDelay(pdMS_TO_TICKS(100));
+}
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -703,9 +758,6 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
-    uint16_t counter = 0;
-    uint16_t log_count = 1000;
-    char *testLog = malloc(sizeof(char) * 64);
     FlashMap_t inmem_flash_map;
 
     osDelay(pdMS_TO_TICKS(100));
@@ -737,64 +789,42 @@ void StartDefaultTask(void *argument)
 
     if (was_power_cycled())
     {
-		osDelay(pdMS_TO_TICKS(100));
-		printf("[Power cycled] Writing %u test logs.\n\r", log_count);
-		printf("\n\r[Power cycled] Logs written: 00000/%05u\b\b\b\b\b\b\b\b\b\b\b", log_count-1);
-
-		for (int i = 0; i < log_count; i++)
-		{
-			osDelay(pdMS_TO_TICKS(5));
-			printf("%05u/%05u\b\b\b\b\b\b\b\b\b\b\b", i, log_count-1);
-			sprintf(testLog, "%02u:%02u:%02u ~ Test log %05u.", time_now.Hours, time_now.Minutes, time_now.Seconds, counter);
-			flash_map_append_string(&inmem_flash_map, (uint8_t *)testLog);
-			counter++;
-		}
-
-		printf("\n\rWritten %d test logs.\n\r", log_count);
-		flash_map_save(&inmem_flash_map, FLASH_SECTOR_3_ADDRESS);
-		printf("Saved flash map to flash storage.\n\r");
-		osDelay(pdMS_TO_TICKS(100));
+		printf("[Power cycled]\n\r");
     }
 
-    printf("\n\rReading test logs in loop:\n\r");
-    uint8_t sectorIdx = inmem_flash_map.head_sector_index;
-    uint16_t stringIdx = 0;
 
   /* Infinite loop */
-  for(;;)
-  {
-	// check if need to start over from head
-	if (sectorIdx == inmem_flash_map.tail_sector_index && stringIdx >= inmem_flash_map.next_string_write_index)
-	{
-		//sectorIdx = inmem_flash_map.head_sector_index;
-		//stringIdx = 0;
-		break;
-	}
-	// check if need to increment read sector
-	if (stringIdx >= inmem_flash_map.sectors_string_capacities[sectorIdx])
-	{
-		sectorIdx++;
-		stringIdx = 0;
-		if (sectorIdx >= FLASH_USED_SECTORS_COUNT) sectorIdx = 0;
-	}
-
-    flash_map_get_string_nonalloc(&inmem_flash_map, sectorIdx, stringIdx, (uint8_t *)testLog);
-    printf("%02u%02u:%02u ~ Sector %d String %05u[%s]\n\r", time_now.Hours, time_now.Minutes, time_now.Seconds, inmem_flash_map.sectors_numbers[sectorIdx], stringIdx, testLog);
-    osDelay(pdMS_TO_TICKS(1));
-	stringIdx++;
-  }
-
-  printf("Done.\n\r");
-
   for(;;)
   {
 	char operation = '~';
 	char target = '~';
     osDelay(pdMS_TO_TICKS(100));
 
+	printf("Test interface. Enter operation character:\n\r\
+			e: erase sector\n\r\
+			w: write <target>x1,024 logs to flash map\n\r\
+			p: print all logs sequentially\n\r");
+
 	HAL_UART_Receive(&huart3, (uint8_t *)&operation, 1, 0xFFFF);
 	printf("operation %c\n\r", operation);
     osDelay(pdMS_TO_TICKS(100));
+
+    switch (operation) {
+		case 'e':
+			printf("Erase sector: enter sector number to erase or x to abort.\n\r");
+			break;
+		case 'w':
+			printf("Write logs: enter single digit to write x1,020 logs.\n\r");
+			break;
+		case 'p':
+			print_flash_map_logs(&inmem_flash_map);
+			break;
+		default:
+			break;
+	}
+
+    if (operation == 'p') continue;
+    if (operation == 'x') continue;
 
 	HAL_UART_Receive(&huart3, (uint8_t *)&target, 1, 0xFFFF);
 	printf("target %c\n\r", target);
@@ -804,11 +834,15 @@ void StartDefaultTask(void *argument)
 		case 'e':
 		flash_erase_sector((uint32_t)atoi(&target));
 			break;
+		case 'w':
+		write_test_flash_map(&inmem_flash_map, 1000*(uint16_t)atoi(&target));
+			break;
 		default:
 			break;
 	}
 
   }
+
   /* USER CODE END 5 */
 }
 

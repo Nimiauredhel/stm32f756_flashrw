@@ -62,7 +62,7 @@ FlashMap_t flash_map_initialize(uint8_t numSectors, const FlashSectorConfig_t *i
 void flash_map_append_string(FlashMap_t *map, uint8_t *new_string)
 {
 	// if current sector is maxed out, we need to target the next one
-	if(map->next_string_write_index >
+	if(map->next_string_write_index >=
     		map->sectors_string_capacities[map->tail_sector_index])
 	{
 		increment_tail_sector(map);
@@ -102,9 +102,6 @@ static void increment_tail_sector(FlashMap_t *map)
 	// check bounds and cycle around if necessary
 	if (new_tail >= map->sectors_count) new_tail = 0;
 
-	// new sector, so set next index to zero
-	map->next_string_write_index = 0;
-
 	// check if head needs to be erased and incremented
 	if (new_tail == map->head_sector_index)
 	{
@@ -120,5 +117,14 @@ static void increment_tail_sector(FlashMap_t *map)
 			flash_erase_sector(map->sectors_numbers[new_tail]);
 			map->sectors_erased_flags[new_tail] = 1;
 		}
+
+		// Apply new head!
+		map->head_sector_index = new_head;
 	}
+
+	// Apply new tail!
+	map->tail_sector_index = new_tail;
+
+	// new sector, so set next index to zero
+	map->next_string_write_index = 0;
 }
