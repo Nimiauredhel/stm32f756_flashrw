@@ -23,7 +23,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "stm32f7xx_ll_rtc.h"
+#include "stm32f7xx_ll_pwr.h"
 #include "stdlib.h"
+#include "inttypes.h"
 #include "flash_rw.h"
 #include "flash_map.h"
 /* USER CODE END Includes */
@@ -671,7 +674,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	// increment the alarm so it keeps going
 	HAL_RTC_GetAlarm(hrtc,&sAlarm,RTC_ALARM_A,FORMAT_BIN);
 
-	if(sAlarm.AlarmTime.Seconds < 58)
+	if(sAlarm.AlarmTime.Seconds < 59)
 	{
 		sAlarm.AlarmTime.Seconds += 1;
 	}
@@ -717,7 +720,7 @@ void print_flash_map_logs(FlashMap_t *map)
 		}
 
 		flash_map_get_string_nonalloc(map, sectorIdx, stringIdx, (uint8_t *)testLog);
-		printf("%02u%02u:%02u ~ Sector %lu String %05u[%s]\n\r", time_now.Hours, time_now.Minutes, time_now.Seconds, map->sectors_numbers[sectorIdx], stringIdx, testLog);
+		printf("%02u:%02u:%02u ~ Sector %lu String %05u[%s]\n\r", time_now.Hours, time_now.Minutes, time_now.Seconds, map->sectors_numbers[sectorIdx], stringIdx, testLog);
 		osDelay(pdMS_TO_TICKS(1));
 		stringIdx++;
 	}
@@ -727,24 +730,149 @@ void print_flash_map_logs(FlashMap_t *map)
 
 void write_test_flash_map(FlashMap_t *map, uint16_t log_count)
 {
-	uint16_t counter = 0;
 	char testLog[FLASH_STRING_LENGTH_BYTES];
 	printf("Writing %u test logs of max length %u.\n\r", log_count, map->string_length_bytes);
 	printf("\n\rLogs written: 00000/%05u\b\b\b\b\b\b\b\b\b\b\b", log_count-1);
 
-	for (int i = 0; i < log_count; i++)
+	for (uint16_t i = 0; i < log_count; i++)
 	{
-		osDelay(pdMS_TO_TICKS(4));
+		osDelay(1);
 		printf("%05u/%05u\b\b\b\b\b\b\b\b\b\b\b", i, log_count-1);
-		sprintf(testLog, "%02u:%02u:%02u ~ Test log %05u.", time_now.Hours, time_now.Minutes, time_now.Seconds, counter);
+		sprintf(testLog, "%02u:%02u:%02u ~ Test log %05hu.", time_now.Hours, time_now.Minutes, time_now.Seconds, i);
 		flash_map_append_string(map, (uint8_t *)testLog);
-		counter++;
 	}
 
 	printf("\n\rWritten %d test logs.\n\r", log_count);
 	flash_map_save(map, FLASH_SECTOR_3_ADDRESS);
 	printf("Saved flash map to flash storage.\n\r");
 	osDelay(pdMS_TO_TICKS(100));
+}
+
+void reset_alarm()
+{
+	static RTC_AlarmTypeDef sAlarm;
+
+	// update the global timestamp
+	HAL_RTC_GetTime(&hrtc, &time_now, FORMAT_BIN);
+	HAL_RTC_GetDate(&hrtc, &date_now, FORMAT_BIN);
+
+	// set the alarm so it keeps going
+	HAL_RTC_GetAlarm(&hrtc,&sAlarm,RTC_ALARM_A,FORMAT_BIN);
+
+	if (time_now.Seconds >= 59) sAlarm.AlarmTime.Seconds = 0;
+	else sAlarm.AlarmTime.Seconds = time_now.Seconds + 1;
+
+	while(HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, FORMAT_BIN)!=HAL_OK)
+	{
+	}
+}
+
+void print_date_time()
+{
+	printf("\n\rThe current date is: %02u/%02u/%02u.\n\r", date_now.Date, date_now.Month, date_now.Year);
+	printf("The current time is: %02u:%02u:%02u.\n\r", time_now.Hours, time_now.Minutes, time_now.Seconds);
+}
+
+void set_date_time()
+{
+	RTC_DateTypeDef sDate = {0};
+	RTC_TimeTypeDef sTime = {0};
+	char input[2];
+	uint8_t num = 0;
+
+	sDate.WeekDay = RTC_WEEKDAY_MONDAY;
+	sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+	sTime.StoreOperation = RTC_STOREOPERATION_RESET;
+
+	printf("Let's set the date.\n\rAll values are two digits including leading zero.\n\r");
+	printf("enter year (yes two digits, STM is not Y2K prepared): ");
+	HAL_UART_Receive(&huart3, (uint8_t *)&input[0], 1, 0xFFFF);
+	printf("%c", input[0]);
+	osDelay(100);
+	HAL_UART_Receive(&huart3, (uint8_t *)&input[1], 1, 0xFFFF);
+	printf("%c", input[1]);
+
+	num = atoi(input);
+	sDate.Year = num;
+	osDelay(100);
+
+	num = 30;
+	while (num < 1 || num > 12)
+	{
+		printf("\n\renter month: ");
+		HAL_UART_Receive(&huart3, (uint8_t *)&input[0], 1, 0xFFFF);
+		printf("%c", input[0]);
+		osDelay(100);
+		HAL_UART_Receive(&huart3, (uint8_t *)&input[1], 1, 0xFFFF);
+		printf("%c", input[1]);
+
+		num = atoi(input);
+	}
+
+	sDate.Month = num;
+	osDelay(100);
+
+	printf("\n\renter day of the month: ");
+	HAL_UART_Receive(&huart3, (uint8_t *)&input[0], 1, 0xFFFF);
+	printf("%c", input[0]);
+	osDelay(100);
+	HAL_UART_Receive(&huart3, (uint8_t *)&input[1], 1, 0xFFFF);
+	printf("%c", input[1]);
+
+	num = atoi(input);
+	sDate.Date = num;
+	osDelay(100);
+
+	printf("Let's set the time.\n\rAll values are two digits including leading zero.\n\r");
+	printf("enter hour: ");
+	HAL_UART_Receive(&huart3, (uint8_t *)&input[0], 1, 0xFFFF);
+	printf("%c", input[0]);
+	osDelay(100);
+	HAL_UART_Receive(&huart3, (uint8_t *)&input[1], 1, 0xFFFF);
+	printf("%c", input[1]);
+
+	num = atoi(input);
+	sTime.Hours = num;
+	osDelay(100);
+
+	printf("\n\renter minutes: ");
+	HAL_UART_Receive(&huart3, (uint8_t *)&input[0], 1, 0xFFFF);
+	printf("%c", input[0]);
+	osDelay(100);
+	HAL_UART_Receive(&huart3, (uint8_t *)&input[1], 1, 0xFFFF);
+	printf("%c", input[1]);
+
+	num = atoi(input);
+	sTime.Minutes = num;
+	osDelay(100);
+
+	printf("\n\renter seconds: ");
+	HAL_UART_Receive(&huart3, (uint8_t *)&input[0], 1, 0xFFFF);
+	printf("%c", input[0]);
+	osDelay(100);
+	HAL_UART_Receive(&huart3, (uint8_t *)&input[1], 1, 0xFFFF);
+	printf("%c", input[1]);
+
+	num = atoi(input);
+	sTime.Seconds = num;
+
+	if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK)
+	{
+		printf("Error setting the date, apparently.\n\r");
+		Error_Handler();
+	}
+
+	if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
+	{
+		printf("Error setting the time, apparently.\n\r");
+		Error_Handler();
+	}
+
+	reset_alarm();
+	printf("\n\rLet's wait a second...\n\r");
+	osDelay(pdMS_TO_TICKS(1100));
+	print_date_time();
+	osDelay(100);
 }
 /* USER CODE END 4 */
 
@@ -760,8 +888,17 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN 5 */
     FlashMap_t inmem_flash_map;
 
+    printf("\n\rOne moment...");
+    osDelay(pdMS_TO_TICKS(250));
+    printf(".");
+    osDelay(pdMS_TO_TICKS(250));
+    printf(".");
+    osDelay(pdMS_TO_TICKS(250));
+    printf(".");
+    osDelay(pdMS_TO_TICKS(250));
+    printf("\rHello from default task start.\n\r");
     osDelay(pdMS_TO_TICKS(100));
-    printf("\n\rHello from default task start.\n\r");
+    print_date_time();
     osDelay(pdMS_TO_TICKS(100));
 
     // load existing map if exists, or create new
@@ -803,7 +940,10 @@ void StartDefaultTask(void *argument)
 	printf("Test interface. Enter operation character:\n\r\
 			e: erase sector\n\r\
 			w: write <target>x1,024 logs to flash map\n\r\
-			p: print all logs sequentially\n\r");
+			p: print all logs sequentially\n\r\
+			d: print date & time\n\r\
+			t: set date & time\n\r\
+			R: RESET SYSTEM\n\r");
 
 	HAL_UART_Receive(&huart3, (uint8_t *)&operation, 1, 0xFFFF);
 	printf("operation %c\n\r", operation);
@@ -814,28 +954,46 @@ void StartDefaultTask(void *argument)
 			printf("Erase sector: enter sector number to erase or x to abort.\n\r");
 			break;
 		case 'w':
-			printf("Write logs: enter single digit to write x1,020 logs.\n\r");
+			printf("Write logs: enter single digit to write x1,024 logs.\n\r");
 			break;
 		case 'p':
 			print_flash_map_logs(&inmem_flash_map);
-			break;
+			continue;
+		case 't':
+			set_date_time();
+			continue;
+		case 'd':
+			print_date_time();
+			continue;
+		case 'R':
+			HAL_NVIC_SystemReset();
+			break; // lol
 		default:
 			break;
 	}
-
-    if (operation == 'p') continue;
-    if (operation == 'x') continue;
 
 	HAL_UART_Receive(&huart3, (uint8_t *)&target, 1, 0xFFFF);
 	printf("target %c\n\r", target);
     osDelay(pdMS_TO_TICKS(100));
 
+	if (target == 'x')
+	{
+		printf("Operation cancelled.\n\r");
+		continue;
+	}
+
     switch (operation) {
 		case 'e':
-		flash_erase_sector((uint32_t)atoi(&target));
+		uint32_t num = (uint32_t)atoi(&target);
+		if (num < 3 || num > 7)
+		{
+			printf("Invalid sector selected.\n\r");
+			continue;
+		}
+		flash_erase_sector(num);
 			break;
 		case 'w':
-		write_test_flash_map(&inmem_flash_map, 1000*(uint16_t)atoi(&target));
+		write_test_flash_map(&inmem_flash_map, 1024*(uint16_t)atoi(&target));
 			break;
 		default:
 			break;
