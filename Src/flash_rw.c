@@ -17,7 +17,7 @@ void flash_erase_sector(uint32_t sector_to_erase)
 
 	// filling in the flash erase struct
 	flash_erase_struct.TypeErase = FLASH_TYPEERASE_SECTORS;
-	flash_erase_struct.Sector = FLASH_SECTOR_5;
+	flash_erase_struct.Sector = sector_to_erase;
 	flash_erase_struct.NbSectors = 1;
     flash_erase_struct.VoltageRange = 2;
 

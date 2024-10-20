@@ -10,7 +10,7 @@
 
 #include "flash_rw.h"
 
-#define FLASH_MAP_VERSION 1
+#define FLASH_MAP_VERSION 2
 
 #define FLASH_USED_SECTORS_COUNT 4
 #define FLASH_STRING_LENGTH_BYTES 64
@@ -52,13 +52,13 @@ typedef struct FlashMap
 	uint8_t tail_sector_index;
 	// index (within sector) to which the next string should be written. usage example:
 	// next_string_address == (uint8_t *)sector_address + (string_length_bytes * next_index)
-	uint8_t next_string_write_index;
+	uint16_t next_string_write_index;
 	// equals 1 if sector erased, 0 if sector written
 	uint8_t sectors_erased_flags[FLASH_USED_SECTORS_COUNT];
-	// hardware reference number of each sector
-	uint8_t sectors_numbers[FLASH_USED_SECTORS_COUNT];
 	// total number of strings each sector can hold
 	uint16_t sectors_string_capacities[FLASH_USED_SECTORS_COUNT];
+	// hardware reference number of each sector
+	uint32_t sectors_numbers[FLASH_USED_SECTORS_COUNT];
 	// memory address of each sector
 	uint32_t sectors_addresses[FLASH_USED_SECTORS_COUNT];
 } FlashMap_t;
@@ -67,14 +67,14 @@ typedef struct FlashSectorConfig
 {
 	uint32_t sector_address;
 	uint32_t sector_size_bytes;
-	uint8_t sector_number;
+	uint32_t sector_number;
 } FlashSectorConfig_t;
 
 extern const FlashSectorConfig_t sector_configs[FLASH_USED_SECTORS_COUNT];
 
 void flash_map_save(FlashMap_t *map, uint32_t dstAddress);
-void flash_map_load(FlashMap_t *map, uint32_t dstAddress);
-FlashMap_t flash_map_initialize(uint8_t numSectors, FlashSectorConfig_t *initData);
+void flash_map_load_nonalloc(FlashMap_t *map, uint32_t dstAddress);
+FlashMap_t flash_map_initialize(uint8_t numSectors, const FlashSectorConfig_t *initData, bool eraseAll);
 void flash_map_append_string(FlashMap_t *map, uint8_t *new_string);
 void flash_map_get_string_nonalloc(FlashMap_t *map, uint8_t sector_index, uint8_t string_index, uint8_t *return_buffer);
 

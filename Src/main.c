@@ -685,11 +685,11 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	}
 
 	HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, index == 0);
-	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, index == 1);
+	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, index == 1 || index == 3);
 	HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, index == 2);
 
 	index++;
-	if (index >= 3) index = 0;
+	if (index > 3) index = 0;
 }
 /* USER CODE END 4 */
 
@@ -704,47 +704,110 @@ void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
     uint16_t counter = 0;
-    uint16_t log_count = 100;
+    uint16_t log_count = 1000;
     char *testLog = malloc(sizeof(char) * 64);
+    FlashMap_t inmem_flash_map;
 
     osDelay(pdMS_TO_TICKS(100));
-
-    printf("Hello from default task start.\n\r");
+    printf("\n\rHello from default task start.\n\r");
     osDelay(pdMS_TO_TICKS(100));
+
+    // load existing map if exists, or create new
+    flash_map_load_nonalloc(&inmem_flash_map, FLASH_SECTOR_3_ADDRESS);
+
+    if (inmem_flash_map.map_erased_flag || inmem_flash_map.map_version_number < FLASH_MAP_VERSION)
+    {
+    	printf("No saved flash map or old version, initializing new one.\n\r");
+		inmem_flash_map = flash_map_initialize(FLASH_USED_SECTORS_COUNT, sector_configs, false);
+		printf("Saving new flash map to sector 3.");
+		flash_map_save(&inmem_flash_map, FLASH_SECTOR_3_ADDRESS);
+
+		// verifying that flash map was actually saved correctly
+		printf("Testing map saving operation.\n\r");
+		FlashMap_t test_map;
+		flash_map_load_nonalloc(&test_map, FLASH_SECTOR_3_ADDRESS);
+		if (test_map.map_erased_flag == inmem_flash_map.map_erased_flag
+				&& test_map.map_version_number == inmem_flash_map.map_version_number
+				&& test_map.sectors_count == inmem_flash_map.sectors_count
+				&& test_map.next_string_write_index == inmem_flash_map.next_string_write_index)
+		{
+			printf("Saved map appears valid.\n\r");
+		} else printf("Saved map NOT VALID.\n\r");
+    }
 
     if (was_power_cycled())
     {
-		printf("[Power cycled] Erasing sector 5.\n\r");
-		flash_erase_sector(FLASH_SECTOR_5);
 		osDelay(pdMS_TO_TICKS(100));
-		printf("[Power cycled] Writing %d test logs.\n\r", log_count);
-		printf("[Power cycled] Logs written: 000/%02d\b\b\b\b\b\b\b", log_count-1);
+		printf("[Power cycled] Writing %u test logs.\n\r", log_count);
+		printf("\n\r[Power cycled] Logs written: 00000/%05u\b\b\b\b\b\b\b\b\b\b\b", log_count-1);
 
 		for (int i = 0; i < log_count; i++)
 		{
-			osDelay(pdMS_TO_TICKS(50));
-			printf("%03d/%03d\b\b\b\b\b\b\b", i, log_count-1);
-			sprintf(testLog, "%02d:%02d:%02d ~ Test log %03d.", time_now.Hours, time_now.Minutes, time_now.Seconds, counter);
-			flash_write(FLASH_SECTOR_5_ADDRESS+(counter*64), (uint8_t *)testLog, 64);
+			osDelay(pdMS_TO_TICKS(5));
+			printf("%05u/%05u\b\b\b\b\b\b\b\b\b\b\b", i, log_count-1);
+			sprintf(testLog, "%02u:%02u:%02u ~ Test log %05u.", time_now.Hours, time_now.Minutes, time_now.Seconds, counter);
+			flash_map_append_string(&inmem_flash_map, (uint8_t *)testLog);
 			counter++;
 		}
 
 		printf("\n\rWritten %d test logs.\n\r", log_count);
-		counter = 0;
+		flash_map_save(&inmem_flash_map, FLASH_SECTOR_3_ADDRESS);
+		printf("Saved flash map to flash storage.\n\r");
 		osDelay(pdMS_TO_TICKS(100));
     }
 
-    printf("Reading test logs in loop:\n\r");
+    printf("\n\rReading test logs in loop:\n\r");
+    uint8_t sectorIdx = inmem_flash_map.head_sector_index;
+    uint16_t stringIdx = 0;
+
   /* Infinite loop */
   for(;;)
   {
-    uint32_t srcAdr = FLASH_SECTOR_5_ADDRESS + (counter*64);
-    flash_read(srcAdr, (uint8_t *)testLog, 64);
-	HAL_RTC_GetTime(&hrtc, &time_now, FORMAT_BIN);
-    printf("%02d:%02d:%02d ~ Log %d[%s]\n\r", time_now.Hours, time_now.Minutes, time_now.Seconds, counter, testLog);
-    osDelay(pdMS_TO_TICKS(500));
-    counter++;
-    if (counter >= log_count) counter = 0;
+	// check if need to start over from head
+	if (sectorIdx == inmem_flash_map.tail_sector_index && stringIdx >= inmem_flash_map.next_string_write_index)
+	{
+		//sectorIdx = inmem_flash_map.head_sector_index;
+		//stringIdx = 0;
+		break;
+	}
+	// check if need to increment read sector
+	if (stringIdx >= inmem_flash_map.sectors_string_capacities[sectorIdx])
+	{
+		sectorIdx++;
+		stringIdx = 0;
+		if (sectorIdx >= FLASH_USED_SECTORS_COUNT) sectorIdx = 0;
+	}
+
+    flash_map_get_string_nonalloc(&inmem_flash_map, sectorIdx, stringIdx, (uint8_t *)testLog);
+    printf("%02u%02u:%02u ~ Sector %d String %05u[%s]\n\r", time_now.Hours, time_now.Minutes, time_now.Seconds, inmem_flash_map.sectors_numbers[sectorIdx], stringIdx, testLog);
+    osDelay(pdMS_TO_TICKS(1));
+	stringIdx++;
+  }
+
+  printf("Done.\n\r");
+
+  for(;;)
+  {
+	char operation = '~';
+	char target = '~';
+    osDelay(pdMS_TO_TICKS(100));
+
+	HAL_UART_Receive(&huart3, (uint8_t *)&operation, 1, 0xFFFF);
+	printf("operation %c\n\r", operation);
+    osDelay(pdMS_TO_TICKS(100));
+
+	HAL_UART_Receive(&huart3, (uint8_t *)&target, 1, 0xFFFF);
+	printf("target %c\n\r", target);
+    osDelay(pdMS_TO_TICKS(100));
+
+    switch (operation) {
+		case 'e':
+		flash_erase_sector((uint32_t)atoi(&target));
+			break;
+		default:
+			break;
+	}
+
   }
   /* USER CODE END 5 */
 }

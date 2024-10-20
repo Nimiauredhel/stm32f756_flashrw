@@ -10,6 +10,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 #include "stm32f7xx_hal.h"
 
 #define BUFFER_CHAR_LENGTH 32
