@@ -86,7 +86,7 @@ void flash_map_append_string(FlashMap_t *map, uint8_t *new_string)
 	map->next_string_write_index++;
 }
 
-void flash_map_get_string_nonalloc(FlashMap_t *map, uint8_t sector_index, uint8_t string_index, uint8_t *return_buffer)
+void flash_map_get_string_nonalloc(FlashMap_t *map, uint8_t sector_index, uint16_t string_index, uint8_t *return_buffer)
 {
 	uint32_t source_address =
 			(map->sectors_addresses[sector_index])

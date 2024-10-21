@@ -76,6 +76,6 @@ void flash_map_save(FlashMap_t *map, uint32_t dstAddress);
 void flash_map_load_nonalloc(FlashMap_t *map, uint32_t dstAddress);
 FlashMap_t flash_map_initialize(uint8_t numSectors, const FlashSectorConfig_t *initData, bool eraseAll);
 void flash_map_append_string(FlashMap_t *map, uint8_t *new_string);
-void flash_map_get_string_nonalloc(FlashMap_t *map, uint8_t sector_index, uint8_t string_index, uint8_t *return_buffer);
+void flash_map_get_string_nonalloc(FlashMap_t *map, uint8_t sector_index, uint16_t string_index, uint8_t *return_buffer);
 
 #endif /* FLASH_MAP_H_ */

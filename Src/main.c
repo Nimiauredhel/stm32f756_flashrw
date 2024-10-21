@@ -26,7 +26,6 @@
 #include "stm32f7xx_ll_rtc.h"
 #include "stm32f7xx_ll_pwr.h"
 #include "stdlib.h"
-#include "inttypes.h"
 #include "flash_rw.h"
 #include "flash_map.h"
 /* USER CODE END Includes */
@@ -738,7 +737,7 @@ void write_test_flash_map(FlashMap_t *map, uint16_t log_count)
 	{
 		osDelay(1);
 		printf("%05u/%05u\b\b\b\b\b\b\b\b\b\b\b", i, log_count-1);
-		sprintf(testLog, "%02u:%02u:%02u ~ Test log %05hu.", time_now.Hours, time_now.Minutes, time_now.Seconds, i);
+		sprintf(testLog, "%02u:%02u:%02u ~ Test log %05u.", time_now.Hours, time_now.Minutes, time_now.Seconds, i);
 		flash_map_append_string(map, (uint8_t *)testLog);
 	}
 
