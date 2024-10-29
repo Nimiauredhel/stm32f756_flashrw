@@ -698,30 +698,45 @@ void print_flash_map_logs(FlashMap_t *map)
 {
 	printf("\n\rPrinting test logs:\n\r");
 	uint8_t sectorIdx = map->head_sector_index;
-	uint16_t stringIdx = 0;
+    uint8_t prevStringLength = 0;
+    uint8_t lastStringLength = 0;
+	uint32_t sectorOffset = 0;
 	char testLog[FLASH_STRING_LENGTH_BYTES];
+
+	memset(testLog, '\0', FLASH_STRING_LENGTH_BYTES);
 
 	for(;;)
 	{
-		// check if need to start over from head
-		if (sectorIdx == map->tail_sector_index && stringIdx >= map->next_string_write_index)
+		// check if finished reading current sector
+		if(sectorOffset >= map->sectors_write_offsets[sectorIdx])
 		{
-			//sectoridx = inmem_flash_map.head_sector_index;
-			//stringidx = 0;
-			break;
-		}
-		// check if need to increment read sector
-		if (stringIdx >= map->sectors_string_capacities[sectorIdx])
-		{
-			sectorIdx++;
-			stringIdx = 0;
-			if (sectorIdx >= FLASH_USED_SECTORS_COUNT) sectorIdx = 0;
+			// check if need to stop (or start over, but stop for now)
+			if (sectorIdx == map->tail_sector_index)
+			{
+				//sectoridx = inmem_flash_map->head_sector_index;
+				//stringidx = 0;
+				break;
+			}
+			// else increment read sector
+			else
+			{
+				sectorIdx++;
+				sectorOffset = 0;
+				if (sectorIdx >= FLASH_USED_SECTORS_COUNT) sectorIdx = 0;
+			}
 		}
 
-		flash_map_get_string_nonalloc(map, sectorIdx, stringIdx, (uint8_t *)testLog);
-		printf("%02u:%02u:%02u ~ Sector %lu String %05u[%s]\n\r", time_now.Hours, time_now.Minutes, time_now.Seconds, map->sectors_numbers[sectorIdx], stringIdx, testLog);
+		lastStringLength = flash_map_get_string_nonalloc(map, sectorIdx, sectorOffset, (uint8_t *)testLog);
+		printf("%02u:%02u:%02u ~ Sector %lu <+%lu>(%02u)[%s]\n\r", time_now.Hours, time_now.Minutes, time_now.Seconds, map->sectors_numbers[sectorIdx], sectorOffset, lastStringLength, testLog);
 		osDelay(pdMS_TO_TICKS(1));
-		stringIdx++;
+		sectorOffset += lastStringLength + 1;
+
+		if (lastStringLength != prevStringLength)
+		{
+			memset(testLog, '\0', FLASH_STRING_LENGTH_BYTES);
+		}
+
+		prevStringLength = lastStringLength;
 	}
 
 	printf("Done.\n\r");
@@ -729,16 +744,17 @@ void print_flash_map_logs(FlashMap_t *map)
 
 void write_test_flash_map(FlashMap_t *map, uint16_t log_count)
 {
+    uint8_t last_string_length = 0;
 	char testLog[FLASH_STRING_LENGTH_BYTES];
-	printf("Writing %u test logs of max length %u.\n\r", log_count, map->string_length_bytes);
+	printf("Writing %u test logs of max length %u.\n\r", log_count, FLASH_STRING_LENGTH_BYTES);
 	printf("\n\rLogs written: 00000/%05u\b\b\b\b\b\b\b\b\b\b\b", log_count-1);
 
 	for (uint16_t i = 0; i < log_count; i++)
 	{
 		osDelay(1);
-		printf("%05u/%05u\b\b\b\b\b\b\b\b\b\b\b", i, log_count-1);
-		sprintf(testLog, "%02u:%02u:%02u ~ Test log %05u.", time_now.Hours, time_now.Minutes, time_now.Seconds, i);
-		flash_map_append_string(map, (uint8_t *)testLog);
+		printf("%05u/%05u(%02u)\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b", i, log_count-1, last_string_length);
+		sprintf(testLog, "%u:%u:%u ~ Test log %u.", time_now.Hours, time_now.Minutes, time_now.Seconds, i);
+		last_string_length = flash_map_append_string(map, (uint8_t *)testLog);
 	}
 
 	printf("\n\rWritten %d test logs.\n\r", log_count);
@@ -885,7 +901,7 @@ void set_date_time()
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
-    FlashMap_t inmem_flash_map;
+    FlashMap_t *inmem_flash_map = malloc(sizeof(FlashMap_t));
 
     printf("\n\rOne moment...");
     osDelay(pdMS_TO_TICKS(250));
@@ -901,26 +917,29 @@ void StartDefaultTask(void *argument)
     osDelay(pdMS_TO_TICKS(100));
 
     // load existing map if exists, or create new
-    flash_map_load_nonalloc(&inmem_flash_map, FLASH_SECTOR_3_ADDRESS);
+    flash_map_load_nonalloc(inmem_flash_map, FLASH_SECTOR_3_ADDRESS);
 
-    if (inmem_flash_map.map_erased_flag || inmem_flash_map.map_version_number < FLASH_MAP_VERSION)
+    if (inmem_flash_map->map_erased_flag || inmem_flash_map->map_version_number < FLASH_MAP_VERSION)
     {
     	printf("No saved flash map or old version, initializing new one.\n\r");
-		inmem_flash_map = flash_map_initialize(FLASH_USED_SECTORS_COUNT, sector_configs, false);
+		flash_map_initialize_nonalloc(inmem_flash_map, FLASH_USED_SECTORS_COUNT, sector_configs, false);
 		printf("Saving new flash map to sector 3.");
-		flash_map_save(&inmem_flash_map, FLASH_SECTOR_3_ADDRESS);
+		flash_map_save(inmem_flash_map, FLASH_SECTOR_3_ADDRESS);
 
 		// verifying that flash map was actually saved correctly
 		printf("Testing map saving operation.\n\r");
-		FlashMap_t test_map;
-		flash_map_load_nonalloc(&test_map, FLASH_SECTOR_3_ADDRESS);
-		if (test_map.map_erased_flag == inmem_flash_map.map_erased_flag
-				&& test_map.map_version_number == inmem_flash_map.map_version_number
-				&& test_map.sectors_count == inmem_flash_map.sectors_count
-				&& test_map.next_string_write_index == inmem_flash_map.next_string_write_index)
+
+		FlashMap_t *test_map = malloc(sizeof(FlashMap_t));
+		flash_map_load_nonalloc(test_map, FLASH_SECTOR_3_ADDRESS);
+
+		if (test_map->map_erased_flag == inmem_flash_map->map_erased_flag
+				&& test_map->map_version_number == inmem_flash_map->map_version_number
+				&& test_map->sectors_count == inmem_flash_map->sectors_count)
 		{
 			printf("Saved map appears valid.\n\r");
 		} else printf("Saved map NOT VALID.\n\r");
+
+        free(test_map);
     }
 
     if (was_power_cycled())
@@ -956,7 +975,7 @@ void StartDefaultTask(void *argument)
 			printf("Write logs: enter single digit to write x1,024 logs.\n\r");
 			break;
 		case 'p':
-			print_flash_map_logs(&inmem_flash_map);
+			print_flash_map_logs(inmem_flash_map);
 			continue;
 		case 't':
 			set_date_time();
@@ -992,7 +1011,7 @@ void StartDefaultTask(void *argument)
 		flash_erase_sector(num);
 			break;
 		case 'w':
-		write_test_flash_map(&inmem_flash_map, 1024*(uint16_t)atoi(&target));
+		write_test_flash_map(inmem_flash_map, 1024*(uint16_t)atoi(&target));
 			break;
 		default:
 			break;
