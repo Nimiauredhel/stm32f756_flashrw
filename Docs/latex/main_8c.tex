@@ -1,0 +1,262 @@
+\hypertarget{main_8c}{}\doxysection{Src/main.c File Reference}
+\label{main_8c}\index{Src/main.c@{Src/main.c}}
+
+
+\+: Main program body  
+
+
+{\ttfamily \#include \char`\"{}main.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}string.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}cmsis\+\_\+os.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}stm32f7xx\+\_\+ll\+\_\+rtc.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}stm32f7xx\+\_\+ll\+\_\+pwr.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}stdlib.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}flash\+\_\+rw.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}flash\+\_\+map.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+Include dependency graph for main.\+c\+:
+% FIG 0
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structRxBuffer}{Rx\+Buffer}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{main_8c_a23a261abd5cc14d407d98b157fdb035a}\label{main_8c_a23a261abd5cc14d407d98b157fdb035a}} 
+\#define {\bfseries RX\+\_\+\+BUFFER\+\_\+\+LENGTH}~48
+\item 
+\mbox{\Hypertarget{main_8c_a4f58c8ea86e1d4c14a0a027eec6896da}\label{main_8c_a4f58c8ea86e1d4c14a0a027eec6896da}} 
+\#define {\bfseries RTC\+\_\+\+BKUP\+\_\+\+COMPARE}~0x1234
+\end{DoxyCompactItemize}
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{main_8c_ac5fe3edc316c327b85079e42426365f1}\label{main_8c_ac5fe3edc316c327b85079e42426365f1}} 
+typedef struct \mbox{\hyperlink{structRxBuffer}{Rx\+Buffer}} {\bfseries Rx\+Buffer\+\_\+t}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{main_8c_abac7707b6be5733e890091048fcb99a2}\label{main_8c_abac7707b6be5733e890091048fcb99a2}} 
+int {\bfseries fputc} (int ch, FILE $\ast$f)
+\item 
+void \mbox{\hyperlink{main_8c_a70af21c671abfcc773614a9a4f63d920}{System\+Clock\+\_\+\+Config}} (void)
+\begin{DoxyCompactList}\small\item\em System Clock Configuration. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8c_a99d0fdb0434092bcb24d9c9af917e4e9}{Start\+Default\+Task}} (void $\ast$argument)
+\begin{DoxyCompactList}\small\item\em Function implementing the default\+Task thread. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{main_8c_aa8253cd89ed4b268472ed62f4f2074ae}\label{main_8c_aa8253cd89ed4b268472ed62f4f2074ae}} 
+void {\bfseries user\+\_\+init} (void)
+\item 
+int \mbox{\hyperlink{main_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\begin{DoxyCompactList}\small\item\em The application entry point. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{main_8c_ae494a9643f29b87d6d81e5264e60e57b}\label{main_8c_ae494a9643f29b87d6d81e5264e60e57b}} 
+void {\bfseries HAL\+\_\+\+UART\+\_\+\+Rx\+Cplt\+Callback} (UART\+\_\+\+Handle\+Type\+Def $\ast$huart)
+\item 
+\mbox{\Hypertarget{main_8c_a11aeff83fd498cddbed3bcddcf017e0a}\label{main_8c_a11aeff83fd498cddbed3bcddcf017e0a}} 
+void {\bfseries HAL\+\_\+\+RTC\+\_\+\+Alarm\+AEvent\+Callback} (RTC\+\_\+\+Handle\+Type\+Def $\ast$hrtc)
+\item 
+\mbox{\Hypertarget{main_8c_a7f813ac6465e8f4e523f90589ab0d9b9}\label{main_8c_a7f813ac6465e8f4e523f90589ab0d9b9}} 
+void {\bfseries print\+\_\+flash\+\_\+map\+\_\+logs} (Flash\+Map\+\_\+t $\ast$map)
+\item 
+\mbox{\Hypertarget{main_8c_a39cbb8d4bf7d3339dca4cef4ee9a1cef}\label{main_8c_a39cbb8d4bf7d3339dca4cef4ee9a1cef}} 
+void {\bfseries write\+\_\+test\+\_\+flash\+\_\+map} (Flash\+Map\+\_\+t $\ast$map, uint16\+\_\+t log\+\_\+count)
+\item 
+\mbox{\Hypertarget{main_8c_a4aaa8ba21487e980879c22cc3e2213a9}\label{main_8c_a4aaa8ba21487e980879c22cc3e2213a9}} 
+void {\bfseries reset\+\_\+alarm} ()
+\item 
+\mbox{\Hypertarget{main_8c_af9030b0cb204724cd1c1d5f4d2b0995b}\label{main_8c_af9030b0cb204724cd1c1d5f4d2b0995b}} 
+void {\bfseries print\+\_\+date\+\_\+time} ()
+\item 
+\mbox{\Hypertarget{main_8c_ac74bfcd8be09d5ff296b09b2e678b527}\label{main_8c_ac74bfcd8be09d5ff296b09b2e678b527}} 
+void {\bfseries set\+\_\+date\+\_\+time} ()
+\item 
+void \mbox{\hyperlink{main_8c_a8a3b0ad512a6e6c6157440b68d395eac}{HAL\+\_\+\+TIM\+\_\+\+Period\+Elapsed\+Callback}} (TIM\+\_\+\+Handle\+Type\+Def $\ast$htim)
+\begin{DoxyCompactList}\small\item\em Period elapsed callback in non blocking mode. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8c_a1730ffe1e560465665eb47d9264826f9}{Error\+\_\+\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em This function is executed in case of error occurrence. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+ETH\+\_\+\+Tx\+Packet\+Config \mbox{\hyperlink{main_8c_a9ed19a93e08023302057789fb61f1ddd}{Tx\+Config}}
+\item 
+\mbox{\Hypertarget{main_8c_a3605d86556d96074ff098be46eca2837}\label{main_8c_a3605d86556d96074ff098be46eca2837}} 
+ETH\+\_\+\+Handle\+Type\+Def {\bfseries heth}
+\item 
+\mbox{\Hypertarget{main_8c_af7b2c26e44dadaaa798a5c3d82914ba7}\label{main_8c_af7b2c26e44dadaaa798a5c3d82914ba7}} 
+I2\+C\+\_\+\+Handle\+Type\+Def {\bfseries hi2c1}
+\item 
+\mbox{\Hypertarget{main_8c_aa0c7fca836406ade332e1e3f1039d8ab}\label{main_8c_aa0c7fca836406ade332e1e3f1039d8ab}} 
+RTC\+\_\+\+Handle\+Type\+Def {\bfseries hrtc}
+\item 
+\mbox{\Hypertarget{main_8c_ab7c63c1b0f65db92b6a4ea19edf957e1}\label{main_8c_ab7c63c1b0f65db92b6a4ea19edf957e1}} 
+UART\+\_\+\+Handle\+Type\+Def {\bfseries huart3}
+\item 
+\mbox{\Hypertarget{main_8c_a3ec0d70a6cb9406d997fb3d006cc940d}\label{main_8c_a3ec0d70a6cb9406d997fb3d006cc940d}} 
+PCD\+\_\+\+Handle\+Type\+Def {\bfseries hpcd\+\_\+\+USB\+\_\+\+OTG\+\_\+\+FS}
+\item 
+\mbox{\Hypertarget{main_8c_a6a263905468b0c37de4ee5e50ede4e74}\label{main_8c_a6a263905468b0c37de4ee5e50ede4e74}} 
+os\+Thread\+Id\+\_\+t {\bfseries default\+Task\+Handle}
+\item 
+const os\+Thread\+Attr\+\_\+t {\bfseries default\+Task\+\_\+attributes}
+\item 
+\mbox{\Hypertarget{main_8c_aff5f3aed8fb7ea4a37bbb804aacb8b4e}\label{main_8c_aff5f3aed8fb7ea4a37bbb804aacb8b4e}} 
+os\+Message\+Queue\+Id\+\_\+t {\bfseries my\+Queue01\+Handle}
+\item 
+const os\+Message\+Queue\+Attr\+\_\+t {\bfseries my\+Queue01\+\_\+attributes}
+\item 
+\mbox{\Hypertarget{main_8c_aa904a054507486376747f21bb36804f1}\label{main_8c_aa904a054507486376747f21bb36804f1}} 
+\mbox{\hyperlink{structRxBuffer}{Rx\+Buffer\+\_\+t}} {\bfseries input\+\_\+buffer}
+\item 
+\mbox{\Hypertarget{main_8c_a6cb5bb7d581e38ad9737a29a6f2e5997}\label{main_8c_a6cb5bb7d581e38ad9737a29a6f2e5997}} 
+RTC\+\_\+\+Time\+Type\+Def {\bfseries time\+\_\+now}
+\item 
+\mbox{\Hypertarget{main_8c_a5e7c48a47b8d08083ad7af65854f3d90}\label{main_8c_a5e7c48a47b8d08083ad7af65854f3d90}} 
+RTC\+\_\+\+Date\+Type\+Def {\bfseries date\+\_\+now}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\+: Main program body 
+
+\begin{DoxyAttention}{Attention}
+
+\end{DoxyAttention}
+Copyright (c) 2024 STMicroelectronics. All rights reserved.
+
+This software is licensed under terms that can be found in the LICENSE file in the root directory of this software component. If no LICENSE file comes with this software, it is provided AS-\/\+IS. 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{main_8c_a1730ffe1e560465665eb47d9264826f9}\label{main_8c_a1730ffe1e560465665eb47d9264826f9}} 
+\index{main.c@{main.c}!Error\_Handler@{Error\_Handler}}
+\index{Error\_Handler@{Error\_Handler}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{Error\_Handler()}{Error\_Handler()}}
+{\footnotesize\ttfamily void Error\+\_\+\+Handler (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+This function is executed in case of error occurrence. 
+
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+\mbox{\Hypertarget{main_8c_a8a3b0ad512a6e6c6157440b68d395eac}\label{main_8c_a8a3b0ad512a6e6c6157440b68d395eac}} 
+\index{main.c@{main.c}!HAL\_TIM\_PeriodElapsedCallback@{HAL\_TIM\_PeriodElapsedCallback}}
+\index{HAL\_TIM\_PeriodElapsedCallback@{HAL\_TIM\_PeriodElapsedCallback}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{HAL\_TIM\_PeriodElapsedCallback()}{HAL\_TIM\_PeriodElapsedCallback()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+TIM\+\_\+\+Period\+Elapsed\+Callback (\begin{DoxyParamCaption}\item[{TIM\+\_\+\+Handle\+Type\+Def $\ast$}]{htim }\end{DoxyParamCaption})}
+
+
+
+Period elapsed callback in non blocking mode. 
+
+\begin{DoxyNote}{Note}
+This function is called when TIM1 interrupt took place, inside HAL\+\_\+\+TIM\+\_\+\+IRQHandler(). It makes a direct call to HAL\+\_\+\+Inc\+Tick() to increment a global variable \char`\"{}uw\+Tick\char`\"{} used as application time base. 
+\end{DoxyNote}
+
+\begin{DoxyParams}{Parameters}
+{\em htim} & \+: TIM handle \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+\mbox{\Hypertarget{main_8c_a840291bc02cba5474a4cb46a9b9566fe}\label{main_8c_a840291bc02cba5474a4cb46a9b9566fe}} 
+\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+The application entry point. 
+
+
+\begin{DoxyRetVals}{Return values}
+{\em int} & \\
+\hline
+\end{DoxyRetVals}
+\mbox{\Hypertarget{main_8c_a99d0fdb0434092bcb24d9c9af917e4e9}\label{main_8c_a99d0fdb0434092bcb24d9c9af917e4e9}} 
+\index{main.c@{main.c}!StartDefaultTask@{StartDefaultTask}}
+\index{StartDefaultTask@{StartDefaultTask}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{StartDefaultTask()}{StartDefaultTask()}}
+{\footnotesize\ttfamily void Start\+Default\+Task (\begin{DoxyParamCaption}\item[{void $\ast$}]{argument }\end{DoxyParamCaption})}
+
+
+
+Function implementing the default\+Task thread. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em argument} & Not used \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+\mbox{\Hypertarget{main_8c_a70af21c671abfcc773614a9a4f63d920}\label{main_8c_a70af21c671abfcc773614a9a4f63d920}} 
+\index{main.c@{main.c}!SystemClock\_Config@{SystemClock\_Config}}
+\index{SystemClock\_Config@{SystemClock\_Config}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{SystemClock\_Config()}{SystemClock\_Config()}}
+{\footnotesize\ttfamily void System\+Clock\+\_\+\+Config (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+System Clock Configuration. 
+
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+Configure LSE Drive Capability
+
+Configure the main internal regulator output voltage
+
+Initializes the RCC Oscillators according to the specified parameters in the RCC\+\_\+\+Osc\+Init\+Type\+Def structure.
+
+Initializes the CPU, AHB and APB buses clocks
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{main_8c_a25fbb54afdba71c24ba51ed50166ac8d}\label{main_8c_a25fbb54afdba71c24ba51ed50166ac8d}} 
+\index{main.c@{main.c}!defaultTask\_attributes@{defaultTask\_attributes}}
+\index{defaultTask\_attributes@{defaultTask\_attributes}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{defaultTask\_attributes}{defaultTask\_attributes}}
+{\footnotesize\ttfamily const os\+Thread\+Attr\+\_\+t default\+Task\+\_\+attributes}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= \{}
+\DoxyCodeLine{  .name = \textcolor{stringliteral}{"{}defaultTask"{}},}
+\DoxyCodeLine{  .stack\_size = 128 * 4,}
+\DoxyCodeLine{  .priority = (osPriority\_t) osPriorityNormal,}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{main_8c_a7195dc89b185d710112479d7bb9c9b36}\label{main_8c_a7195dc89b185d710112479d7bb9c9b36}} 
+\index{main.c@{main.c}!myQueue01\_attributes@{myQueue01\_attributes}}
+\index{myQueue01\_attributes@{myQueue01\_attributes}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{myQueue01\_attributes}{myQueue01\_attributes}}
+{\footnotesize\ttfamily const os\+Message\+Queue\+Attr\+\_\+t my\+Queue01\+\_\+attributes}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= \{}
+\DoxyCodeLine{  .name = \textcolor{stringliteral}{"{}myQueue01"{}}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{main_8c_a9ed19a93e08023302057789fb61f1ddd}\label{main_8c_a9ed19a93e08023302057789fb61f1ddd}} 
+\index{main.c@{main.c}!TxConfig@{TxConfig}}
+\index{TxConfig@{TxConfig}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{TxConfig}{TxConfig}}
+{\footnotesize\ttfamily ETH\+\_\+\+Tx\+Packet\+Config Tx\+Config}
+
+$<$ IAR Compiler 

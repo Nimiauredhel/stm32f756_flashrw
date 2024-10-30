@@ -1,0 +1,261 @@
+\hypertarget{stm32f7xx__hal__msp_8c}{}\doxysection{Src/stm32f7xx\+\_\+hal\+\_\+msp.c File Reference}
+\label{stm32f7xx__hal__msp_8c}\index{Src/stm32f7xx\_hal\_msp.c@{Src/stm32f7xx\_hal\_msp.c}}
+
+
+This file provides code for the MSP Initialization and de-\/\+Initialization codes.  
+
+
+{\ttfamily \#include \char`\"{}main.\+h\char`\"{}}\newline
+Include dependency graph for stm32f7xx\+\_\+hal\+\_\+msp.\+c\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{stm32f7xx__hal__msp_8c_ae4fb8e66865c87d0ebab74a726a6891f}{HAL\+\_\+\+Msp\+Init}} (void)
+\item 
+void \mbox{\hyperlink{stm32f7xx__hal__msp_8c_a1ffa1e1337d6e52a3b175144a4505ea7}{HAL\+\_\+\+ETH\+\_\+\+Msp\+Init}} (ETH\+\_\+\+Handle\+Type\+Def $\ast$heth)
+\begin{DoxyCompactList}\small\item\em ETH MSP Initialization This function configures the hardware resources used in this example. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{stm32f7xx__hal__msp_8c_adb9c31d86584307ca7791f3c3fbe58d9}{HAL\+\_\+\+ETH\+\_\+\+Msp\+De\+Init}} (ETH\+\_\+\+Handle\+Type\+Def $\ast$heth)
+\begin{DoxyCompactList}\small\item\em ETH MSP De-\/\+Initialization This function freeze the hardware resources used in this example. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{stm32f7xx__hal__msp_8c_abe01a202c27b23fc150aa66af3130073}{HAL\+\_\+\+I2\+C\+\_\+\+Msp\+Init}} (I2\+C\+\_\+\+Handle\+Type\+Def $\ast$hi2c)
+\begin{DoxyCompactList}\small\item\em I2C MSP Initialization This function configures the hardware resources used in this example. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{stm32f7xx__hal__msp_8c_a2ec8d9b09854c732e2feed549278f048}{HAL\+\_\+\+I2\+C\+\_\+\+Msp\+De\+Init}} (I2\+C\+\_\+\+Handle\+Type\+Def $\ast$hi2c)
+\begin{DoxyCompactList}\small\item\em I2C MSP De-\/\+Initialization This function freeze the hardware resources used in this example. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{stm32f7xx__hal__msp_8c_aee6eddaa309c8c9829f1ca794d8f99c5}{HAL\+\_\+\+RTC\+\_\+\+Msp\+Init}} (RTC\+\_\+\+Handle\+Type\+Def $\ast$hrtc)
+\begin{DoxyCompactList}\small\item\em RTC MSP Initialization This function configures the hardware resources used in this example. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{stm32f7xx__hal__msp_8c_a8767bc3a4d472d39a688090ab10ba6ce}{HAL\+\_\+\+RTC\+\_\+\+Msp\+De\+Init}} (RTC\+\_\+\+Handle\+Type\+Def $\ast$hrtc)
+\begin{DoxyCompactList}\small\item\em RTC MSP De-\/\+Initialization This function freeze the hardware resources used in this example. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{stm32f7xx__hal__msp_8c_a0e553b32211877322f949b14801bbfa7}{HAL\+\_\+\+UART\+\_\+\+Msp\+Init}} (UART\+\_\+\+Handle\+Type\+Def $\ast$huart)
+\begin{DoxyCompactList}\small\item\em UART MSP Initialization This function configures the hardware resources used in this example. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{stm32f7xx__hal__msp_8c_a718f39804e3b910d738a0e1e46151188}{HAL\+\_\+\+UART\+\_\+\+Msp\+De\+Init}} (UART\+\_\+\+Handle\+Type\+Def $\ast$huart)
+\begin{DoxyCompactList}\small\item\em UART MSP De-\/\+Initialization This function freeze the hardware resources used in this example. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{stm32f7xx__hal__msp_8c_a73af972b44ba2890202363cd8b197dad}{HAL\+\_\+\+PCD\+\_\+\+Msp\+Init}} (PCD\+\_\+\+Handle\+Type\+Def $\ast$hpcd)
+\begin{DoxyCompactList}\small\item\em PCD MSP Initialization This function configures the hardware resources used in this example. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{stm32f7xx__hal__msp_8c_a8194c593b1db635b225c4b6294f31e47}{HAL\+\_\+\+PCD\+\_\+\+Msp\+De\+Init}} (PCD\+\_\+\+Handle\+Type\+Def $\ast$hpcd)
+\begin{DoxyCompactList}\small\item\em PCD MSP De-\/\+Initialization This function freeze the hardware resources used in this example. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This file provides code for the MSP Initialization and de-\/\+Initialization codes. 
+
+\begin{DoxyAttention}{Attention}
+
+\end{DoxyAttention}
+Copyright (c) 2024 STMicroelectronics. All rights reserved.
+
+This software is licensed under terms that can be found in the LICENSE file in the root directory of this software component. If no LICENSE file comes with this software, it is provided AS-\/\+IS. 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{stm32f7xx__hal__msp_8c_adb9c31d86584307ca7791f3c3fbe58d9}\label{stm32f7xx__hal__msp_8c_adb9c31d86584307ca7791f3c3fbe58d9}} 
+\index{stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}!HAL\_ETH\_MspDeInit@{HAL\_ETH\_MspDeInit}}
+\index{HAL\_ETH\_MspDeInit@{HAL\_ETH\_MspDeInit}!stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}}
+\doxysubsubsection{\texorpdfstring{HAL\_ETH\_MspDeInit()}{HAL\_ETH\_MspDeInit()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+ETH\+\_\+\+Msp\+De\+Init (\begin{DoxyParamCaption}\item[{ETH\+\_\+\+Handle\+Type\+Def $\ast$}]{heth }\end{DoxyParamCaption})}
+
+
+
+ETH MSP De-\/\+Initialization This function freeze the hardware resources used in this example. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em heth} & ETH handle pointer \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+ETH GPIO Configuration PC1 -\/-\/-\/---$>$ ETH\+\_\+\+MDC PA1 -\/-\/-\/---$>$ ETH\+\_\+\+REF\+\_\+\+CLK PA2 -\/-\/-\/---$>$ ETH\+\_\+\+MDIO PA7 -\/-\/-\/---$>$ ETH\+\_\+\+CRS\+\_\+\+DV PC4 -\/-\/-\/---$>$ ETH\+\_\+\+RXD0 PC5 -\/-\/-\/---$>$ ETH\+\_\+\+RXD1 PB13 -\/-\/-\/---$>$ ETH\+\_\+\+TXD1 PG11 -\/-\/-\/---$>$ ETH\+\_\+\+TX\+\_\+\+EN PG13 -\/-\/-\/---$>$ ETH\+\_\+\+TXD0\mbox{\Hypertarget{stm32f7xx__hal__msp_8c_a1ffa1e1337d6e52a3b175144a4505ea7}\label{stm32f7xx__hal__msp_8c_a1ffa1e1337d6e52a3b175144a4505ea7}} 
+\index{stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}!HAL\_ETH\_MspInit@{HAL\_ETH\_MspInit}}
+\index{HAL\_ETH\_MspInit@{HAL\_ETH\_MspInit}!stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}}
+\doxysubsubsection{\texorpdfstring{HAL\_ETH\_MspInit()}{HAL\_ETH\_MspInit()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+ETH\+\_\+\+Msp\+Init (\begin{DoxyParamCaption}\item[{ETH\+\_\+\+Handle\+Type\+Def $\ast$}]{heth }\end{DoxyParamCaption})}
+
+
+
+ETH MSP Initialization This function configures the hardware resources used in this example. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em heth} & ETH handle pointer \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+ETH GPIO Configuration PC1 -\/-\/-\/---$>$ ETH\+\_\+\+MDC PA1 -\/-\/-\/---$>$ ETH\+\_\+\+REF\+\_\+\+CLK PA2 -\/-\/-\/---$>$ ETH\+\_\+\+MDIO PA7 -\/-\/-\/---$>$ ETH\+\_\+\+CRS\+\_\+\+DV PC4 -\/-\/-\/---$>$ ETH\+\_\+\+RXD0 PC5 -\/-\/-\/---$>$ ETH\+\_\+\+RXD1 PB13 -\/-\/-\/---$>$ ETH\+\_\+\+TXD1 PG11 -\/-\/-\/---$>$ ETH\+\_\+\+TX\+\_\+\+EN PG13 -\/-\/-\/---$>$ ETH\+\_\+\+TXD0\mbox{\Hypertarget{stm32f7xx__hal__msp_8c_a2ec8d9b09854c732e2feed549278f048}\label{stm32f7xx__hal__msp_8c_a2ec8d9b09854c732e2feed549278f048}} 
+\index{stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}!HAL\_I2C\_MspDeInit@{HAL\_I2C\_MspDeInit}}
+\index{HAL\_I2C\_MspDeInit@{HAL\_I2C\_MspDeInit}!stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}}
+\doxysubsubsection{\texorpdfstring{HAL\_I2C\_MspDeInit()}{HAL\_I2C\_MspDeInit()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+I2\+C\+\_\+\+Msp\+De\+Init (\begin{DoxyParamCaption}\item[{I2\+C\+\_\+\+Handle\+Type\+Def $\ast$}]{hi2c }\end{DoxyParamCaption})}
+
+
+
+I2C MSP De-\/\+Initialization This function freeze the hardware resources used in this example. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em hi2c} & I2C handle pointer \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+I2\+C1 GPIO Configuration PB8 -\/-\/-\/---$>$ I2\+C1\+\_\+\+SCL PB9 -\/-\/-\/---$>$ I2\+C1\+\_\+\+SDA\mbox{\Hypertarget{stm32f7xx__hal__msp_8c_abe01a202c27b23fc150aa66af3130073}\label{stm32f7xx__hal__msp_8c_abe01a202c27b23fc150aa66af3130073}} 
+\index{stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}!HAL\_I2C\_MspInit@{HAL\_I2C\_MspInit}}
+\index{HAL\_I2C\_MspInit@{HAL\_I2C\_MspInit}!stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}}
+\doxysubsubsection{\texorpdfstring{HAL\_I2C\_MspInit()}{HAL\_I2C\_MspInit()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+I2\+C\+\_\+\+Msp\+Init (\begin{DoxyParamCaption}\item[{I2\+C\+\_\+\+Handle\+Type\+Def $\ast$}]{hi2c }\end{DoxyParamCaption})}
+
+
+
+I2C MSP Initialization This function configures the hardware resources used in this example. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em hi2c} & I2C handle pointer \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+Initializes the peripherals clock
+
+I2\+C1 GPIO Configuration PB8 -\/-\/-\/---$>$ I2\+C1\+\_\+\+SCL PB9 -\/-\/-\/---$>$ I2\+C1\+\_\+\+SDA\mbox{\Hypertarget{stm32f7xx__hal__msp_8c_ae4fb8e66865c87d0ebab74a726a6891f}\label{stm32f7xx__hal__msp_8c_ae4fb8e66865c87d0ebab74a726a6891f}} 
+\index{stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}!HAL\_MspInit@{HAL\_MspInit}}
+\index{HAL\_MspInit@{HAL\_MspInit}!stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}}
+\doxysubsubsection{\texorpdfstring{HAL\_MspInit()}{HAL\_MspInit()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+Msp\+Init (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Initializes the Global MSP. \mbox{\Hypertarget{stm32f7xx__hal__msp_8c_a8194c593b1db635b225c4b6294f31e47}\label{stm32f7xx__hal__msp_8c_a8194c593b1db635b225c4b6294f31e47}} 
+\index{stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}!HAL\_PCD\_MspDeInit@{HAL\_PCD\_MspDeInit}}
+\index{HAL\_PCD\_MspDeInit@{HAL\_PCD\_MspDeInit}!stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}}
+\doxysubsubsection{\texorpdfstring{HAL\_PCD\_MspDeInit()}{HAL\_PCD\_MspDeInit()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+PCD\+\_\+\+Msp\+De\+Init (\begin{DoxyParamCaption}\item[{PCD\+\_\+\+Handle\+Type\+Def $\ast$}]{hpcd }\end{DoxyParamCaption})}
+
+
+
+PCD MSP De-\/\+Initialization This function freeze the hardware resources used in this example. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em hpcd} & PCD handle pointer \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+USB\+\_\+\+OTG\+\_\+\+FS GPIO Configuration PA8 -\/-\/-\/---$>$ USB\+\_\+\+OTG\+\_\+\+FS\+\_\+\+SOF PA9 -\/-\/-\/---$>$ USB\+\_\+\+OTG\+\_\+\+FS\+\_\+\+VBUS PA10 -\/-\/-\/---$>$ USB\+\_\+\+OTG\+\_\+\+FS\+\_\+\+ID PA11 -\/-\/-\/---$>$ USB\+\_\+\+OTG\+\_\+\+FS\+\_\+\+DM PA12 -\/-\/-\/---$>$ USB\+\_\+\+OTG\+\_\+\+FS\+\_\+\+DP\mbox{\Hypertarget{stm32f7xx__hal__msp_8c_a73af972b44ba2890202363cd8b197dad}\label{stm32f7xx__hal__msp_8c_a73af972b44ba2890202363cd8b197dad}} 
+\index{stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}!HAL\_PCD\_MspInit@{HAL\_PCD\_MspInit}}
+\index{HAL\_PCD\_MspInit@{HAL\_PCD\_MspInit}!stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}}
+\doxysubsubsection{\texorpdfstring{HAL\_PCD\_MspInit()}{HAL\_PCD\_MspInit()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+PCD\+\_\+\+Msp\+Init (\begin{DoxyParamCaption}\item[{PCD\+\_\+\+Handle\+Type\+Def $\ast$}]{hpcd }\end{DoxyParamCaption})}
+
+
+
+PCD MSP Initialization This function configures the hardware resources used in this example. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em hpcd} & PCD handle pointer \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+Initializes the peripherals clock
+
+USB\+\_\+\+OTG\+\_\+\+FS GPIO Configuration PA8 -\/-\/-\/---$>$ USB\+\_\+\+OTG\+\_\+\+FS\+\_\+\+SOF PA9 -\/-\/-\/---$>$ USB\+\_\+\+OTG\+\_\+\+FS\+\_\+\+VBUS PA10 -\/-\/-\/---$>$ USB\+\_\+\+OTG\+\_\+\+FS\+\_\+\+ID PA11 -\/-\/-\/---$>$ USB\+\_\+\+OTG\+\_\+\+FS\+\_\+\+DM PA12 -\/-\/-\/---$>$ USB\+\_\+\+OTG\+\_\+\+FS\+\_\+\+DP\mbox{\Hypertarget{stm32f7xx__hal__msp_8c_a8767bc3a4d472d39a688090ab10ba6ce}\label{stm32f7xx__hal__msp_8c_a8767bc3a4d472d39a688090ab10ba6ce}} 
+\index{stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}!HAL\_RTC\_MspDeInit@{HAL\_RTC\_MspDeInit}}
+\index{HAL\_RTC\_MspDeInit@{HAL\_RTC\_MspDeInit}!stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}}
+\doxysubsubsection{\texorpdfstring{HAL\_RTC\_MspDeInit()}{HAL\_RTC\_MspDeInit()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+RTC\+\_\+\+Msp\+De\+Init (\begin{DoxyParamCaption}\item[{RTC\+\_\+\+Handle\+Type\+Def $\ast$}]{hrtc }\end{DoxyParamCaption})}
+
+
+
+RTC MSP De-\/\+Initialization This function freeze the hardware resources used in this example. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em hrtc} & RTC handle pointer \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+\mbox{\Hypertarget{stm32f7xx__hal__msp_8c_aee6eddaa309c8c9829f1ca794d8f99c5}\label{stm32f7xx__hal__msp_8c_aee6eddaa309c8c9829f1ca794d8f99c5}} 
+\index{stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}!HAL\_RTC\_MspInit@{HAL\_RTC\_MspInit}}
+\index{HAL\_RTC\_MspInit@{HAL\_RTC\_MspInit}!stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}}
+\doxysubsubsection{\texorpdfstring{HAL\_RTC\_MspInit()}{HAL\_RTC\_MspInit()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+RTC\+\_\+\+Msp\+Init (\begin{DoxyParamCaption}\item[{RTC\+\_\+\+Handle\+Type\+Def $\ast$}]{hrtc }\end{DoxyParamCaption})}
+
+
+
+RTC MSP Initialization This function configures the hardware resources used in this example. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em hrtc} & RTC handle pointer \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+Initializes the peripherals clock\mbox{\Hypertarget{stm32f7xx__hal__msp_8c_a718f39804e3b910d738a0e1e46151188}\label{stm32f7xx__hal__msp_8c_a718f39804e3b910d738a0e1e46151188}} 
+\index{stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}!HAL\_UART\_MspDeInit@{HAL\_UART\_MspDeInit}}
+\index{HAL\_UART\_MspDeInit@{HAL\_UART\_MspDeInit}!stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}}
+\doxysubsubsection{\texorpdfstring{HAL\_UART\_MspDeInit()}{HAL\_UART\_MspDeInit()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+UART\+\_\+\+Msp\+De\+Init (\begin{DoxyParamCaption}\item[{UART\+\_\+\+Handle\+Type\+Def $\ast$}]{huart }\end{DoxyParamCaption})}
+
+
+
+UART MSP De-\/\+Initialization This function freeze the hardware resources used in this example. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em huart} & UART handle pointer \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+USART3 GPIO Configuration PD8 -\/-\/-\/---$>$ USART3\+\_\+\+TX PD9 -\/-\/-\/---$>$ USART3\+\_\+\+RX\mbox{\Hypertarget{stm32f7xx__hal__msp_8c_a0e553b32211877322f949b14801bbfa7}\label{stm32f7xx__hal__msp_8c_a0e553b32211877322f949b14801bbfa7}} 
+\index{stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}!HAL\_UART\_MspInit@{HAL\_UART\_MspInit}}
+\index{HAL\_UART\_MspInit@{HAL\_UART\_MspInit}!stm32f7xx\_hal\_msp.c@{stm32f7xx\_hal\_msp.c}}
+\doxysubsubsection{\texorpdfstring{HAL\_UART\_MspInit()}{HAL\_UART\_MspInit()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+UART\+\_\+\+Msp\+Init (\begin{DoxyParamCaption}\item[{UART\+\_\+\+Handle\+Type\+Def $\ast$}]{huart }\end{DoxyParamCaption})}
+
+
+
+UART MSP Initialization This function configures the hardware resources used in this example. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em huart} & UART handle pointer \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+Initializes the peripherals clock
+
+USART3 GPIO Configuration PD8 -\/-\/-\/---$>$ USART3\+\_\+\+TX PD9 -\/-\/-\/---$>$ USART3\+\_\+\+RX

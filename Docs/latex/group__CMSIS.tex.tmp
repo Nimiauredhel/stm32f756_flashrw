@@ -1,0 +1,12 @@
+\hypertarget{group__CMSIS}{}\doxysection{CMSIS}
+\label{group__CMSIS}\index{CMSIS@{CMSIS}}
+Collaboration diagram for CMSIS\+:
+% FIG 0
+\doxysubsection*{Modules}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{group__stm32f7xx__system}{Stm32f7xx\+\_\+system}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
